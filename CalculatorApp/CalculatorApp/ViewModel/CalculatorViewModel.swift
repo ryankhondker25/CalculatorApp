@@ -8,6 +8,9 @@
 import Foundation
 
 protocol CalculatorViewModelDelegate: AnyObject {
+    /// Updates the displayed value on the calculator
+    /// - Parameters:
+    ///     - value: The value to display.
     func updateLabel(_ value: String)
 }
 
@@ -72,6 +75,11 @@ final class CalculatorViewModel {
     
     weak var delegate: CalculatorViewModelDelegate?
     
+    /// Called when a button on the calculator is pressed;
+    /// will either update the displayed value or calculate
+    /// the current expression if the equal button (=) is pressed
+    /// - Parameters:
+    ///     - button: The pressed button.
     func didPressButton(_ button: CalculatorButtonType) {
         switch button {
         case .number(let digit):
@@ -148,6 +156,8 @@ final class CalculatorViewModel {
         delegate?.updateLabel(displayValue)
     }
     
+    /// Called when the equal button (=) is pressed; this function makes use of NSExpression
+    /// to calculate the current expression
     private func calculateResult() {
         guard !enteredOperations.isEmpty,
               !currentNumber.isEmpty,
@@ -190,6 +200,10 @@ final class CalculatorViewModel {
         resetCurrentNumber()
     }
     
+    /// Checks if the current expression contains division by zero. If true,
+    /// the calculator will be in an error state and an "Error" message
+    /// will be displayed on the calculator
+    /// - Returns: A Boolean value that indicates if the expression contains division by zero.
     private func containsDivisionByZero() -> Bool {
         if enteredOperations.count > 1 {
             for index in 0..<enteredOperations.count - 1 {
@@ -206,6 +220,8 @@ final class CalculatorViewModel {
         return false
     }
     
+    /// adjustedExpression adjusts the current expression
+    /// to make it compatible with NSExpression
     private var adjustedExpression: String {
         // Using * for multiplication instead of ×
         var expressionString = currentExpression.replacingOccurrences(of: "×", with: "*")
